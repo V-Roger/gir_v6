@@ -5,9 +5,13 @@
 		<!-- TODO: add favicon file -->
 		<!-- <link rel="icon" href="%sveltekit.assets%/favicon.svg" /> -->
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="https://use.typekit.net/nfs5ypt.css" />
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover">
-		<main style="display: contents">%sveltekit.body%</main>
+	<body
+		class="h-screen w-screen overflow-hidden border border-red-500 bg-white p-2 text-black dark:bg-black dark:text-white!"
+		data-sveltekit-preload-data="hover"
+	>
+		<main class="space flex h-full w-full border border-blue-500">%sveltekit.body%</main>
 	</body>
 </html>
