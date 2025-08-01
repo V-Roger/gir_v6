@@ -2,6 +2,7 @@
 
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
+import { eq } from 'drizzle-orm';
 import * as schema from '../src/lib/server/db/schema.ts';
 import fs from 'fs/promises';
 import path from 'path';
@@ -246,7 +247,7 @@ async function importPhotos(galleryName, galleryDescription, imagePaths, quality
       console.log('🔗 Associating photos with gallery...');
       await db.update(schema.galleries)
         .set({ photos: photoIds })
-        .where(schema.galleries.id === gallery.id);
+        .where(eq(schema.galleries.id, gallery.id));
       
       console.log(`✅ Successfully imported ${photoIds.length} photos into gallery "${galleryName}"`);
       console.log(`🎉 Gallery ID: ${gallery.id}`);
