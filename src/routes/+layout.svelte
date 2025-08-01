@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import svgLogo from '../assets/logo_vroger.svg?raw';
-	import { createRoutesTree, flattenRoutesTree } from './routes';
+	import { createRoutesTree, flattenRoutesTree } from './routing';
 
 	import { page } from '$app/state';
 
@@ -17,7 +17,7 @@
 	const { children } = $props();
 </script>
 
-<div class="space-y-4 space-x-4 rounded-lg">
+<div class="space-y-4 space-x-4 pb-4 rounded-lg">
 	<div class="flex w-full rounded-lg">
 		<header class="w-1/6">
 			<a href="/" title="Accueil" class="flex w-full overflow-hidden rounded-lg">
@@ -33,11 +33,11 @@
 					<a
 						href={route.href}
 						class={{
-							'flex rounded-sm py-1 pr-4 hover:bg-black hover:text-white focus:bg-black focus:text-white dark:hover:bg-white dark:hover:text-black dark:focus:bg-white dark:focus:text-black': true,
+							'flex prose prose-neutral rounded-sm py-1 pr-4 hover:bg-black focus:bg-black hover:prose-invert focus:prose-invert dark:hover:bg-white dark:focus:bg-white dark:prose-invert dark:focus:prose-neutral! dark:hover:prose-neutral!': true,
 							'pl-4': route.depth === 0,
 							'pl-8': route.depth === 1,
 							'pl-12': route.depth === 2,
-							'bg-black text-white dark:bg-white dark:text-black': route.href === page.url.pathname
+							'bg-black dark:bg-white prose-invert! dark:prose-neutral!': route.href === page.url.pathname
 						}}
 					>
 						{#if route.depth === 0}
@@ -50,7 +50,7 @@
 			</nav>
 		</aside>
 
-		<section>
+		<section class="rounded-lg w-full overflow-hidden space-y-4">
 			{@render children()}
 		</section>
 	</div>
