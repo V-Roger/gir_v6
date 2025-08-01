@@ -1,11 +1,4 @@
 [dev]
+  command = "pnpm dev"
   targetPort = 1337
   port = 4242
-
-[[redirects]]
-  # Requests to URLs matching this pattern...
-  from = "/netlify-cdn/photos/:file"
-  # ...will resolve to this URL pattern
-  to = "/.netlify/images?url=/photos/:file"
-  # ... and the status code of 200 will make this behave as a rewrite
-  status = 200
