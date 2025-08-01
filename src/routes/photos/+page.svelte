@@ -1,6 +1,1 @@
-<div>
-	<img src="/photos/100.jpg" alt="Photo 1" />
-	<img src="/photos/100.jpg" alt="Photo 1" />
-	<img src="/photos/100.jpg" alt="Photo 1" />
-	<img src="/photos/100.jpg" alt="Photo 1" />
-</div>
+<img src="/.netlify/images?url=/photos/100.jpg" alt="" role="presentation" />

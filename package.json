@@ -13,7 +13,7 @@
 	"license": "Beerware",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev --port 4242",
+		"dev": "vite dev --port 1337",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -55,6 +55,7 @@
 	"dependencies": {
 		"@libsql/client": "^0.14.0",
 		"@neondatabase/serverless": "^0.10.4",
+		"@sveltejs/enhanced-img": "^0.7.0",
 		"drizzle-orm": "^0.40.0"
 	},
 	"pnpm": {

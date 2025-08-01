@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import svgLogo from '../assets/logo_vroger.svg?raw';
-	import { createRoutesTree, flattenRoutesTree } from '$lib/routes';
+	import { createRoutesTree, flattenRoutesTree } from './routes';
 
 	import { page } from '$app/state';
 
