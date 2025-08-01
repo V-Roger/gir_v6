@@ -4,17 +4,27 @@
 	import { createRoutesTree, flattenRoutesTree } from './routing';
 
 	import { page } from '$app/state';
+	const { children, data } = $props();
 
 	const routeDefinitions = import.meta.glob('./*/**/+page.svelte', {
 		eager: true
 	});
 
-	const routesTree = createRoutesTree(routeDefinitions);
+	const galleries = data.galleries;
+	const galleryRoutesDefinitions = Object.fromEntries(
+		galleries.map((gallery) => [`photos/${gallery.name}`, gallery.name])
+	);
+	console.log(galleryRoutesDefinitions);
+	console.log(routeDefinitions);
+	const routesTree = createRoutesTree({
+		...routeDefinitions,
+		...galleryRoutesDefinitions
+	});
+
 	const subRoutes = flattenRoutesTree(routesTree)
 		.sort((a, b) => a.name.localeCompare(b.name))
 		.sort((a, b) => a.depth - b.depth);
 
-	const { children } = $props();
 </script>
 
 <div class="space-y-4 space-x-4 pb-4 rounded-lg">
@@ -50,7 +60,7 @@
 			</nav>
 		</aside>
 
-		<section class="rounded-lg w-full overflow-hidden space-y-4">
+		<section class="max-w-full rounded-lg overflow-hidden space-y-4 prose prose-neutral dark:prose-invert">
 			{@render children()}
 		</section>
 	</div>

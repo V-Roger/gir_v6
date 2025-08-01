@@ -21,7 +21,8 @@ export function createRoutesTree(
 ): Record<string, RouteNode> {
 	const routesTree: Record<string, RouteNode> = {};
 
-	Object.entries(routeDefinitions).forEach(([path]) => {
+	Object.entries(routeDefinitions).filter(([path]) => !path.includes('[slug]')).forEach(([path]) => {
+		console.log(path);
 		// Remove './' prefix and '/+page.svelte' suffix
 		const cleanPath = path.replace(/^\.\//, '').replace('/+page.svelte', '');
 
