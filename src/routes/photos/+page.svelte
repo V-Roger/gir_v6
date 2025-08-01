@@ -1,1 +1,0 @@
-<img src="/.netlify/images?url=/photos/100.jpg" alt="" role="presentation" />
