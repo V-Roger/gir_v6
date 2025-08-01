@@ -8,6 +8,7 @@ export const photos = pgTable('photos', {
 
 export const galleries = pgTable('galleries', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  slug: varchar(),
   name: varchar(),
   description: text(),
   photos: integer().references(() => photos.id).array()

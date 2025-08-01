@@ -13,10 +13,10 @@
 <h1>{gallery.name}</h1>
 <p>{gallery.description}</p>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col items-end not-prose gap-4">
 	{#if photos}
 		{#each photos as photo}
-			<img src={photo.path} alt={ photo.description ?? 'missing description' } />
+			<img src={`/.netlify/images?url=${photo.path}`} alt={ photo.description ?? 'missing description' } class="object-contain max-w-full max-h-screen" />
 		{/each}
 	{:else}
 		<p>Nothing to see here...</p>

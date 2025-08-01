@@ -34,3 +34,6 @@ out/
 .next/
 .nuxt/
 .cache/
+
+# Local photo files to import
+local/

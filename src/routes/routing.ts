@@ -17,12 +17,11 @@ export interface FlatRoute {
  * Creates a routes tree from import.meta.glob result
  */
 export function createRoutesTree(
-	routeDefinitions: Record<string, unknown>
+	routeDefinitions: Record<string, { slug?: string; path: string; name?: string }>
 ): Record<string, RouteNode> {
 	const routesTree: Record<string, RouteNode> = {};
 
 	Object.entries(routeDefinitions).filter(([path]) => !path.includes('[slug]')).forEach(([path]) => {
-		console.log(path);
 		// Remove './' prefix and '/+page.svelte' suffix
 		const cleanPath = path.replace(/^\.\//, '').replace('/+page.svelte', '');
 
@@ -34,7 +33,7 @@ export function createRoutesTree(
 		segments.forEach((segment, index) => {
 			if (!currentLevel[segment]) {
 				currentLevel[segment] = {
-					name: segment,
+					name: routeDefinitions[path].name || segment,
 					path: segments.slice(0, index + 1).join('/'),
 					href: '/' + segments.slice(0, index + 1).join('/'),
 					children: {},

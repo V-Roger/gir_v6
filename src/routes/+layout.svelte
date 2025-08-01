@@ -8,14 +8,13 @@
 
 	const routeDefinitions = import.meta.glob('./*/**/+page.svelte', {
 		eager: true
-	});
+	}) as Record<string, { path: string; }>;
 
 	const galleries = data.galleries;
 	const galleryRoutesDefinitions = Object.fromEntries(
-		galleries.map((gallery) => [`photos/${gallery.name}`, gallery.name])
-	);
-	console.log(galleryRoutesDefinitions);
-	console.log(routeDefinitions);
+		galleries.map((gallery) => [`photos/${gallery.slug}`, { slug: gallery.slug, path: gallery.slug, name: gallery.name }])
+	) as Record<string, { slug?: string; path: string; name?: string }> | undefined;
+
 	const routesTree = createRoutesTree({
 		...routeDefinitions,
 		...galleryRoutesDefinitions

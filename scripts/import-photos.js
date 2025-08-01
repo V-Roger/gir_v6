@@ -34,6 +34,11 @@ if (dbUrl) {
 // Supported image extensions
 const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
+// Function to slugify a string
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
 // Function to get image dimensions and metadata
 async function getImageInfo(imagePath) {
   try {
@@ -129,12 +134,8 @@ function generateGalleryPath(galleryName, originalPath) {
   const filename = `${baseName}${ext}`;
   
   // Create a safe folder name from gallery name
-  const safeGalleryName = galleryName
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-  
+  const safeGalleryName = slugify(galleryName);
+
   return {
     folderName: safeGalleryName,
     filename: filename,
@@ -198,6 +199,7 @@ async function importPhotos(galleryName, galleryDescription, imagePaths, quality
     if (db) {
       console.log('📊 Creating gallery in database...');
       const [galleryResult] = await db.insert(schema.galleries).values({
+        slug: slugify(galleryName),
         name: galleryName,
         description: galleryDescription,
         photos: []
