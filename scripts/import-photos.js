@@ -3,7 +3,7 @@
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import { eq } from 'drizzle-orm';
-import * as schema from '../src/lib/server/db/schema.ts';
+import * as schema from './schema.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -119,12 +119,12 @@ async function processAndSaveImage(sourcePath, galleryFolder, filename, quality 
     // Save processed image
     await processedImage.toFile(destPath);
     
-    return `photos/${galleryFolder}/${filename}`;
+    return destPath;
   } catch (error) {
     console.warn(`⚠️  Could not process ${sourcePath}, copying original: ${error.message}`);
     // Fallback to copying original file
     await fs.copyFile(sourcePath, destPath);
-    return `photos/${galleryFolder}/${filename}`;
+    return destPath;
   }
 }
 
@@ -132,9 +132,19 @@ async function processAndSaveImage(sourcePath, galleryFolder, filename, quality 
 function generateGalleryPath(galleryName, originalPath) {
   const ext = path.extname(originalPath).toLowerCase();
   const baseName = path.basename(originalPath, ext);
-  const filename = `${slugify(baseName)}${ext}`;
   
-  // Create a safe folder name from gallery name
+  // Preserve original filename casing but make it URL-safe
+  // Replace spaces and special characters with hyphens, but keep original case
+  const safeFilename = baseName
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  
+  const filename = `${safeFilename}${ext}`;
+  
+  // Create a safe folder name from gallery name (still lowercase for consistency)
   const safeGalleryName = slugify(galleryName);
 
   return {
@@ -231,7 +241,7 @@ async function importPhotos(galleryName, galleryDescription, imagePaths, quality
       // Create photo entry in database
       if (db) {
         const [photo] = await db.insert(schema.photos).values({
-          path: relativePath,
+          path: `photos/${folderName}/${filename}`,
           description: `Imported from ${path.basename(imagePath)}`
         }).returning();
         
@@ -326,7 +336,9 @@ async function main() {
     if (options.dryRun) {
       console.log('🔍 DRY RUN MODE - No files will be imported\n');
       for (const path of expandedPaths) {
+        const { folderName, filename } = generateGalleryPath(options.galleryName, path);
         console.log(`📸 Would import: ${path}`);
+        console.log(`   → Would save as: ${folderName}/${filename}`);
       }
       console.log(`\n📊 Would create gallery: "${options.galleryName}"`);
       console.log(`📝 Description: "${options.galleryDescription}"`);
