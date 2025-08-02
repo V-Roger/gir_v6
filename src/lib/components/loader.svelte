@@ -1,4 +1,11 @@
-<div class="loader"></div>
+<script lang="ts">
+  let { relative = false } = $props()
+</script>
+
+<div
+  class="loader"
+  class:relative
+></div>
 
 <style>
   .loader {
@@ -16,6 +23,10 @@
     background: var(--color-white);
     --c: #0000 64%, #000 66% 98%, #0000 101%;
     filter: blur(4px) contrast(12);
+  }
+
+  .loader.relative {
+    position: relative;
   }
 
   @media (prefers-color-scheme: dark) {

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { redirect } from '@sveltejs/kit'
   import type { PageProps } from './$types'
-  import { onMount } from 'svelte'
   import Loader from '$lib/components/loader.svelte'
+  import IntersectionObserver from '$lib/components/intersectionObserver.svelte'
+  import { onMount } from 'svelte'
 
   const { data }: PageProps = $props()
 
@@ -10,12 +11,11 @@
     throw redirect(302, '/photos')
   }
 
-  let loadedImages = $state(new Set<string>())
+  let loadedImages = $state<string[]>([])
   let loadingImages = $state(new Set<string>())
-  let hasLoaded = $derived(loadingImages.size === 0)
 
   function handleImageLoad(photoPath: string) {
-    loadedImages.add(photoPath)
+    loadedImages.push(photoPath)
     loadingImages.delete(photoPath)
   }
 
@@ -25,16 +25,24 @@
   }
 
   function startLoadingImage(photoPath: string) {
-    if (!loadedImages.has(photoPath)) {
+    if (!loadedImages.includes(photoPath)) {
       loadingImages.add(photoPath)
     }
   }
 
-  // Start loading all images immediately
-  data.photos.forEach((photo) => {
-    if (photo.path) {
-      startLoadingImage(photo.path)
+  function loadNextPhoto({ currentPhoto }: { currentPhoto: (typeof data.photos)[number] }) {
+    const nextPhoto = data.photos[data.photos.findIndex((photo) => photo.path === currentPhoto.path) + 1]
+    if (nextPhoto?.path) {
+      startLoadingImage(nextPhoto.path)
     }
+  }
+
+  onMount(() => {
+    data.photos.slice(0, 5).forEach((photo) => {
+      if (photo.path) {
+        startLoadingImage(photo.path)
+      }
+    })
   })
 </script>
 
@@ -43,18 +51,26 @@
 
 <div class="not-prose flex flex-col items-end gap-4">
   {#if data.photos}
-    {#if hasLoaded}
-      <Loader />
-    {/if}
     {#each data.photos as photo}
-      <img
-        src={`/.netlify/images?url=${photo.path}`}
-        alt={photo.description ?? 'missing description'}
-        onload={() => photo.path && handleImageLoad(photo.path)}
-        onerror={() => photo.path && handleImageError(photo.path)}
-        class="max-h-screen max-w-full object-contain"
-        loading="lazy"
-      />
+      {#if photo.path}
+        {#if !loadedImages.includes(photo.path)}
+          <Loader relative />
+        {/if}
+        <IntersectionObserver
+          once
+          intersect={() => loadNextPhoto({ currentPhoto: photo })}
+        >
+          <img
+            src={`/.netlify/images?url=${photo.path}`}
+            alt={photo.description ?? 'missing description'}
+            onload={() => photo.path && handleImageLoad(photo.path)}
+            onerror={() => photo.path && handleImageError(photo.path)}
+            class:opacity-0={!loadedImages.includes(photo.path)}
+            class="max-h-screen max-w-full object-contain"
+            loading="lazy"
+          />
+        </IntersectionObserver>
+      {/if}
     {/each}
   {:else}
     <p>Nothing to see here...</p>
