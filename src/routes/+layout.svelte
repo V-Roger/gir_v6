@@ -1,10 +1,12 @@
 <script lang="ts">
   import '../app.css'
   import svgLogo from '../assets/logo_vroger.svg?raw'
-  import { createRoutesTree, flattenRoutesTree } from './routing'
+  import { createRoutesTree, flattenRoutesTree } from '$lib/routing'
   import { innerWidth } from 'svelte/reactivity/window'
-
   import { page } from '$app/state'
+  import { afterNavigate, beforeNavigate } from '$app/navigation'
+  import Loader from '$lib/components/loader.svelte'
+
   const { children, data } = $props()
 
   const routeDefinitions = import.meta.glob('./*/**/+page.svelte', { eager: true }) as Record<string, { path: string }>
@@ -25,10 +27,19 @@
 
   const isTooSmall = $derived(innerWidth?.current && innerWidth.current < 1280)
   let isMenuActive = $state(false)
+  let loading = $state(false)
 
-  function toggleMenu() {
-    isMenuActive = !isMenuActive
+  function toggleMenu(force?: boolean) {
+    isMenuActive = force ?? !isMenuActive
   }
+
+  beforeNavigate(() => {
+    loading = true
+  })
+
+  afterNavigate(() => {
+    loading = false
+  })
 </script>
 
 <div class="space-y-4 space-x-4 rounded-lg pb-4">
@@ -44,7 +55,7 @@
       {#if isTooSmall}
         <button
           class="absolute top-4 right-4"
-          onclick={toggleMenu}
+          onclick={() => toggleMenu()}
           aria-label="Menu"
         >
           <svg
@@ -57,7 +68,6 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="lucide lucide-menu"
           >
             <line
               x1="3"
@@ -88,7 +98,7 @@
     class:space-x-4={!isTooSmall}
   >
     <aside
-      class="sticky top-2 h-full max-h-full w-full shrink-0 flex-col items-center transition-all duration-120 xl:w-1/6"
+      class="sticky top-2 h-full max-h-full w-full shrink-0 flex-col items-center transition-all duration-200 ease-out xl:w-1/6"
       class:go-away={isTooSmall && !isMenuActive}
     >
       <nav class="flex w-full flex-col space-y-4">
@@ -102,6 +112,9 @@
               'pl-12': route.depth === 2,
               'bg-black prose-invert! dark:bg-white dark:prose-neutral!': route.href === page.url.pathname,
             }}
+            onclick={() => toggleMenu(false)}
+            data-sveltekit-preload-data="hover"
+            data-sveltekit-preload-code="eager"
           >
             {#if route.depth === 0}
               {route.name} /
@@ -114,10 +127,14 @@
     </aside>
 
     <section
-      class="prose max-w-full space-y-4 overflow-hidden rounded-lg transition-all duration-120 prose-neutral dark:prose-invert"
+      class="prose max-w-full space-y-4 overflow-hidden rounded-lg prose-neutral dark:prose-invert"
       class:hidden={isTooSmall && isMenuActive}
     >
-      {@render children()}
+      {#if loading}
+        <Loader />
+      {:else}
+        {@render children()}
+      {/if}
     </section>
   </div>
 </div>
