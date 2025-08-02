@@ -11,6 +11,7 @@ export interface FlatRoute {
   name: string
   path: string
   depth: number
+  target?: string
 }
 
 /**

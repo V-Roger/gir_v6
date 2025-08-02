@@ -24,6 +24,9 @@
   const subRoutes = flattenRoutesTree(routesTree)
     .sort((a, b) => a.name.localeCompare(b.name))
     .sort((a, b) => a.depth - b.depth)
+    .concat([
+      { href: 'https://shop.virgil-roger.photography', name: 'Boutique', path: 'boutique', depth: 0, target: '_blank' },
+    ])
 
   const isTooSmall = $derived(innerWidth?.current && innerWidth.current < 1280)
   let isMenuActive = $state(false)
@@ -112,6 +115,7 @@
               'pl-12': route.depth === 2,
               'bg-black prose-invert! dark:bg-white dark:prose-neutral!': route.href === page.url.pathname,
             }}
+            target={route.target ?? undefined}
             onclick={() => toggleMenu(false)}
             data-sveltekit-preload-data="hover"
             data-sveltekit-preload-code="eager"
