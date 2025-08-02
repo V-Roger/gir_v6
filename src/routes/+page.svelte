@@ -1,1 +1,4 @@
-<h1>Virgil Roger</h1>
+<img
+  src="/.netlify/images?url=/photos/virgil-roger.jpg"
+  alt="Virgil ROGER"
+/>

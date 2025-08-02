@@ -10,3 +10,14 @@
   --color-black: #1e1e1f;
   --color-white: #fff;
 }
+
+
+.content {
+  li {
+    list-style-type: square;
+  }
+
+  li::marker {
+    color: currentColor;
+  }
+}
