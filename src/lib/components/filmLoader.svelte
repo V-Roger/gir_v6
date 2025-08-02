@@ -10,8 +10,8 @@
 <style>
   .filmstrip {
     position: fixed;
-    top: 50%;
-    left: 50%;
+    top: calc(50% - 50px);
+    left: calc(50% - 30px);
     z-index: 1000;
     width: 60px;
     height: 100px;
@@ -25,7 +25,7 @@
     );
 
     background-size: 60px 200px;
-    transform: rotate(90deg) translate(-50%, -50%);
+    transform: rotate(90deg);
     border-radius: 4px;
     animation: stripeMove 1200ms infinite;
 
