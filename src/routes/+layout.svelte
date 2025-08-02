@@ -5,7 +5,7 @@
   import { innerWidth } from 'svelte/reactivity/window'
   import { page } from '$app/state'
   import { afterNavigate, beforeNavigate } from '$app/navigation'
-  import Loader from '$lib/components/loader.svelte'
+  import Loader from '$lib/components/filmLoader.svelte'
 
   const { children, data } = $props()
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { redirect } from '@sveltejs/kit'
   import type { PageProps } from './$types'
-  import Loader from '$lib/components/loader.svelte'
+  import Loader from '$lib/components/filmLoader.svelte'
   import IntersectionObserver from '$lib/components/intersectionObserver.svelte'
   import { onMount } from 'svelte'
 
