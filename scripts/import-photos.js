@@ -37,7 +37,7 @@ const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
 // Function to slugify a string
 function slugify(str) {
-  return str.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  return str.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
 
 // Function to get image dimensions and metadata
@@ -132,7 +132,7 @@ async function processAndSaveImage(sourcePath, galleryFolder, filename, quality 
 function generateGalleryPath(galleryName, originalPath) {
   const ext = path.extname(originalPath).toLowerCase();
   const baseName = path.basename(originalPath, ext);
-  const filename = `${baseName}${ext}`;
+  const filename = `${slugify(baseName)}${ext}`;
   
   // Create a safe folder name from gallery name
   const safeGalleryName = slugify(galleryName);
