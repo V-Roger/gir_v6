@@ -4,6 +4,7 @@ export const photos = pgTable('photos', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   path: varchar(),
   description: text(),
+  order: integer().default(0),
 })
 
 export const galleries = pgTable('galleries', {
@@ -14,4 +15,6 @@ export const galleries = pgTable('galleries', {
   photos: integer()
     .references(() => photos.id)
     .array(),
+  cover: integer().references(() => photos.id),
+  order: integer().default(0),
 })

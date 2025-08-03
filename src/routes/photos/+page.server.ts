@@ -10,7 +10,10 @@ async function hydrateCoverPhotos(galleriesList: (typeof galleries.$inferSelect 
         return { ...gallery, cover: undefined }
       }
 
-      const cover = await db.select().from(photos).where(eq(photos.id, gallery.photos[0]))
+      const cover = await db
+        .select()
+        .from(photos)
+        .where(eq(photos.id, gallery.cover ?? gallery.photos[0]))
 
       return { ...gallery, cover: cover?.[0] ?? undefined }
     }),
@@ -18,7 +21,7 @@ async function hydrateCoverPhotos(galleriesList: (typeof galleries.$inferSelect 
 }
 
 async function fetchGalleriesWithCover() {
-  const galleriesList = await db.select().from(galleries)
+  const galleriesList = await db.select().from(galleries).orderBy(galleries.order)
   if (galleriesList.length === 0) {
     return []
   }

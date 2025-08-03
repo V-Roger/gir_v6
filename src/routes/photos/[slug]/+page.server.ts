@@ -9,6 +9,7 @@ async function fetchGallery(slug: string) {
     .select()
     .from(photos)
     .where(inArray(photos.id, gallery?.[0]?.photos ?? []))
+    .orderBy(photos.order)
 
   return {
     gallery: gallery?.[0],
