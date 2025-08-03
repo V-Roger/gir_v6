@@ -23,4 +23,29 @@
       </li>
     {/each}
   </ul>
+  <h2>Contact</h2>
+  <div class="flex items-center gap-2">
+    <a
+      href="https://the.fotoapp.co/mr_sumatra"
+      target="_blank"
+      title="Virgil Roger sur Foto"
+    >
+      <img
+        src="/foto.png"
+        alt="Logo Foto"
+        class="h-24 w-24 rounded-xs bg-black p-2 hover:invert"
+      />
+    </a>
+    <a
+      href="https://instagram.com/mr_sumatra"
+      target="_blank"
+      title="Virgil Roger sur Instagram"
+    >
+      <img
+        src="/instagram.svg"
+        alt="Logo Instagram"
+        class="h-24 w-24 rounded-xs bg-black p-8 hover:invert"
+      />
+    </a>
+  </div>
 </div>

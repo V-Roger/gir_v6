@@ -3,43 +3,46 @@ title: Virgil Roger
 date: 2021-07-15T12:09:52.579Z
 portrait: img/20180401_015_934ccdfea6.jpg
 exhibitions:
-  - place: Le Shrubbery, Villeurbanne
-    date: '2023'
-    label: Silhouettes Lyonnaises & Beaujolais Bleu
-  - place: Au Point Nommé, Lyon
-    date: '2021'
+  - place: Canopée Cafés; Romans-sur-Isère
+    date: 2024
     label: Silhouettes Lyonnaises
-  - place: Poltred, Lyon
+  - place: Le Shrubbery; Villeurbanne
+    date: 2023
+    label: Silhouettes Lyonnaises & Beaujolais Bleu
+  - place: Au Point Nommé; Lyon
+    date: 2021
+    label: Silhouettes Lyonnaises
+  - place: Poltred; Lyon
     date: 2020
     label: One Roll n°2
-  - place: Les rencontres photographiques du Prieuré, Salaise sur Sanne
+  - place: Les rencontres photographiques du Prieuré; Salaise sur Sanne
     date: 2019
     label: PUSH +36
-  - place: Livestation DIY, Lyon
+  - place: Livestation DIY; Lyon
     date: 2019
     label: PUSH +2
-  - place: La cordée Jean Macé, Lyon
+  - place: La cordée Jean Macé; Lyon
     date: 2019
     label: PUSH +1
-  - place: Poltred, Lyon
+  - place: Poltred; Lyon
     date: 2019
     label: Silhouettes lyonnaises
-  - place: La cordée Jean Macé, Lyon
+  - place: La cordée Jean Macé; Lyon
     date: 2019
     label: PUSH +1
-  - place: La Maison de l’Économie Circulaire, Lyon
+  - place: La Maison de l’Économie Circulaire; Lyon
     date: 2018
     label: Collages
-  - place: Le Court-Circuit, Lyon
+  - place: Le Court-Circuit; Lyon
     date: 2017
     label: Collages
-  - place: Le Bieristan, Villeurbanne
+  - place: Le Bieristan; Villeurbanne
     date: 2016
     label: Collages
-  - place: Le Bieristan, Villeurbanne
+  - place: Le Bieristan; Villeurbanne
     date: 2015
     label: Please Look Up
-  - place: Le Passage 17, Montauban
+  - place: Le Passage 17; Montauban
     date: 2011
     label: À 50mm du Soudan
 publications:
@@ -59,9 +62,8 @@ publications:
     date: '2024'
 ---
 
-- Auteur photographe à l’approche minimaliste, passionné de
+- Auteur photographe à l’approche minimaliste; passionné de
   procédés argentiques et de vieilles mécaniques
 - À la recherche de sujets qui n’en sont pas
 - Défenseur d’un retour au medium photographique physique
 - Bricoleur et hacker dans l’âme
-- \>>> [Sur Instagram](https://instagram.com/mr_sumatra)

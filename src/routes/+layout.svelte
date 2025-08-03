@@ -45,19 +45,19 @@
   })
 </script>
 
-<div class="space-y-4 space-x-4 rounded-lg pb-4">
-  <div class="flex w-full rounded-lg">
+<div class="space-y-4 space-x-4 rounded-sm pb-4">
+  <div class="flex w-full rounded-sm">
     <header class="w-1/6">
       <a
         href="/"
         title="Accueil"
-        class="flex w-full overflow-hidden rounded-xs xl:rounded-lg"
+        class="flex w-full overflow-hidden rounded-xs xl:rounded-sm"
       >
         {@html svgLogo}
       </a>
       {#if isTooSmall}
         <button
-          class="focus:color-white dark:focus:color-black fixed top-4 right-4 rounded-sm p-1 transition-all hover:bg-black hover:text-white focus:bg-black dark:hover:bg-white dark:hover:text-black dark:focus:bg-white"
+          class="focus:color-white dark:focus:color-black fixed top-4 right-4 rounded-xs p-1 transition-all hover:bg-black hover:text-white focus:bg-black dark:hover:bg-white dark:hover:text-black dark:focus:bg-white"
           onclick={() => toggleMenu()}
           aria-label="Menu"
         >
@@ -109,7 +109,7 @@
           <a
             href={route.href}
             class={{
-              'prose flex rounded-sm py-1 pr-4 prose-neutral hover:bg-black hover:prose-invert focus:bg-black focus:prose-invert dark:prose-invert dark:hover:bg-white dark:hover:prose-neutral! dark:focus:bg-white dark:focus:prose-neutral!': true,
+              'prose flex rounded-xs py-1 pr-4 prose-neutral hover:bg-black hover:prose-invert focus:bg-black focus:prose-invert dark:prose-invert dark:hover:bg-white dark:hover:prose-neutral! dark:focus:bg-white dark:focus:prose-neutral!': true,
               'pl-4': route.depth === 0,
               'pl-8': route.depth === 1,
               'pl-12': route.depth === 2,
@@ -131,7 +131,7 @@
     </aside>
 
     <section
-      class="prose max-w-full space-y-4 overflow-hidden rounded-lg prose-neutral dark:prose-invert"
+      class="prose max-w-full space-y-4 overflow-hidden rounded-sm prose-neutral dark:prose-invert"
       class:hidden={isTooSmall && isMenuActive}
     >
       {#if loading}
