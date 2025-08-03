@@ -12,6 +12,7 @@ import { glob } from 'glob';
 import sharp from 'sharp';
 import { Command } from 'commander';
 import dotenv from 'dotenv';
+import readline from 'readline';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -174,6 +175,51 @@ async function expandGlobPatterns(patterns) {
   return expandedPaths;
 }
 
+// Function to create readline interface for user input
+function createReadlineInterface() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+}
+
+// Function to prompt user for cover photo selection
+async function selectCoverPhoto(processedPhotos) {
+  if (processedPhotos.length === 0) {
+    console.log('⚠️  No photos available to select as cover');
+    return null;
+  }
+
+  const rl = createReadlineInterface();
+  
+  console.log('\n📸 Select a cover photo for the gallery:');
+  console.log('0. No cover photo');
+  
+  processedPhotos.forEach((photo, index) => {
+    const filename = path.basename(photo.path);
+    console.log(`${index + 1}. ${filename}`);
+  });
+  
+  return new Promise((resolve) => {
+    rl.question('\nEnter the number of your choice: ', (answer) => {
+      rl.close();
+      const selection = parseInt(answer);
+      
+      if (isNaN(selection) || selection < 0 || selection > processedPhotos.length) {
+        console.log('⚠️  Invalid selection, no cover photo will be set');
+        resolve(null);
+      } else if (selection === 0) {
+        console.log('✅ No cover photo selected');
+        resolve(null);
+      } else {
+        const selectedPhoto = processedPhotos[selection - 1];
+        console.log(`✅ Selected cover photo: ${path.basename(selectedPhoto.path)}`);
+        resolve(selectedPhoto.id);
+      }
+    });
+  });
+}
+
 // Main import function
 async function importPhotos(galleryName, galleryDescription, imagePaths, quality = 90, compression = 9, optimize = true) {
   try {
@@ -223,6 +269,7 @@ async function importPhotos(galleryName, galleryDescription, imagePaths, quality
     
     // Process each image
     const photoIds = [];
+    const processedPhotos = [];
     
     for (let i = 0; i < validImages.length; i++) {
       const imagePath = validImages[i];
@@ -246,6 +293,7 @@ async function importPhotos(galleryName, galleryDescription, imagePaths, quality
         }).returning();
         
         photoIds.push(photo.id);
+        processedPhotos.push(photo);
         console.log(`  💾 Created photo entry with ID: ${photo.id}\n`);
       } else {
         console.log(`  💾 Skipping database entry (no database connection)\n`);
@@ -261,6 +309,19 @@ async function importPhotos(galleryName, galleryDescription, imagePaths, quality
       
       console.log(`✅ Successfully imported ${photoIds.length} photos into gallery "${galleryName}"`);
       console.log(`🎉 Gallery ID: ${gallery.id}`);
+      
+      // Ask user to select cover photo
+      if (processedPhotos.length > 0) {
+        const coverPhotoId = await selectCoverPhoto(processedPhotos);
+        
+        if (coverPhotoId) {
+          console.log('💾 Updating gallery with cover photo...');
+          await db.update(schema.galleries)
+            .set({ cover: coverPhotoId })
+            .where(eq(schema.galleries.id, gallery.id));
+          console.log(`✅ Cover photo set for gallery "${galleryName}"`);
+        }
+      }
     } else {
       console.log(`✅ Successfully processed ${photoIds.length} photos for gallery "${galleryName}"`);
     }
