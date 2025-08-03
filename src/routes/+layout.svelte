@@ -57,7 +57,7 @@
       </a>
       {#if isTooSmall}
         <button
-          class="absolute top-4 right-4"
+          class="focus:color-white dark:focus:color-black fixed top-4 right-4 rounded-sm p-1 transition-all hover:bg-black hover:text-white focus:bg-black dark:hover:bg-white dark:hover:text-black dark:focus:bg-white"
           onclick={() => toggleMenu()}
           aria-label="Menu"
         >
