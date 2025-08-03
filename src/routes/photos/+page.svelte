@@ -4,7 +4,7 @@
 
 <ul class="grid list-none grid-cols-1 gap-4 pl-0! md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
   {#each data.galleries as gallery}
-    <li class="flex flex-col items-start justify-start rounded-sm bg-black p-2 dark:bg-white">
+    <li class="my-0! flex flex-col items-start justify-start rounded-sm bg-black p-2 dark:bg-white">
       <a href={`/photos/${gallery.slug}`}>
         {#if gallery?.cover?.path}
           <img
