@@ -14,7 +14,7 @@ const config = {
 	// for more information about preprocessors
 	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
 	kit: { adapter: adapter({
-			edge: true
+			edge: false
 		}),
 	},
 	extensions: ['.svelte', '.svx', '.md'],
