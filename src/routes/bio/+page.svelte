@@ -17,13 +17,17 @@
     const result = await compile(bio)
     if (result) {
       content = result.code
-      meta = result.data?.fm ?? {}
+      meta =
+        (result.data?.fm as {
+          exhibitions: { label: string; date: string; place: string }[]
+          publications: { medium: string; date: string }[]
+        }) || undefined
     }
   })
 </script>
 
 <h1>Virgil ROGER</h1>
-{#if !content}
+{#if !content || !meta}
   <Loader />
 {:else}
   <div class="content prose max-w-none dark:prose-invert">
