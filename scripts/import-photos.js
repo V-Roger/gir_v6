@@ -274,6 +274,89 @@ async function resolveDescription(descriptionInput) {
   return descriptionInput;
 }
 
+// Function to scan folder for markdown and image files
+async function scanFolderForGallery(folderPath) {
+  try {
+    // Check if folder exists
+    await fs.access(folderPath);
+    
+    const items = await fs.readdir(folderPath);
+    const markdownFiles = [];
+    const imageFiles = [];
+    
+    for (const item of items) {
+      const itemPath = path.join(folderPath, item);
+      const stats = await fs.stat(itemPath);
+      
+      if (stats.isFile()) {
+        const ext = path.extname(item).toLowerCase();
+        
+        // Check for markdown files
+        if (ext === '.md' || ext === '.markdown') {
+          markdownFiles.push(itemPath);
+        }
+        
+        // Check for image files
+        if (SUPPORTED_EXTENSIONS.includes(ext)) {
+          imageFiles.push(itemPath);
+        }
+      }
+    }
+    
+    return { markdownFiles, imageFiles };
+  } catch (error) {
+    throw new Error(`Could not scan folder "${folderPath}": ${error.message}`);
+  }
+}
+
+// Function to extract gallery info from markdown file
+async function extractGalleryInfoFromMarkdown(markdownPath) {
+  const content = await readMarkdownFile(markdownPath);
+  
+  // Try to extract title from first heading
+  const titleMatch = content.match(/^#\s+(.+)$/m);
+  const title = titleMatch ? titleMatch[1].trim() : path.basename(markdownPath, path.extname(markdownPath));
+  
+  return {
+    name: title,
+    description: content
+  };
+}
+
+// Function to process folder and create gallery
+async function processFolderForGallery(folderPath, quality = 90, compression = 9, optimize = true) {
+  console.log(`\n📁 Scanning folder: ${folderPath}`);
+  
+  const { markdownFiles, imageFiles } = await scanFolderForGallery(folderPath);
+  
+  if (markdownFiles.length === 0) {
+    throw new Error(`No markdown files found in folder "${folderPath}"`);
+  }
+  
+  if (imageFiles.length === 0) {
+    throw new Error(`No image files found in folder "${folderPath}"`);
+  }
+  
+  console.log(`📖 Found ${markdownFiles.length} markdown file(s)`);
+  console.log(`📸 Found ${imageFiles.length} image file(s)`);
+  
+  // Use the first markdown file for gallery info
+  const galleryInfo = await extractGalleryInfoFromMarkdown(markdownFiles[0]);
+  
+  console.log(`\n🎨 Gallery Name: "${galleryInfo.name}"`);
+  console.log(`📝 Description: ${galleryInfo.description.length} characters`);
+  
+  // Import photos using the extracted info
+  await importPhotos(
+    galleryInfo.name,
+    galleryInfo.description,
+    imageFiles,
+    quality,
+    compression,
+    optimize
+  );
+}
+
 // Main import function
 async function importPhotos(galleryName, galleryDescription, imagePaths, quality = 90, compression = 9, optimize = true) {
   try {
@@ -395,9 +478,10 @@ function parseArguments() {
     .name('import-photos')
     .description('Import photos into your Svelte app gallery system')
     .version('1.0.0')
-    .requiredOption('-n, --name <name>', 'Gallery name')
-    .requiredOption('-d, --description <description>', 'Gallery description (text or path to .md/.markdown file)')
-    .requiredOption('-p, --paths <paths...>', 'Image file paths or glob patterns')
+    .option('-n, --name <name>', 'Gallery name (required when not using folder mode)')
+    .option('-d, --description <description>', 'Gallery description (text or path to .md/.markdown file, required when not using folder mode)')
+    .option('-p, --paths <paths...>', 'Image file paths or glob patterns (required when not using folder mode)')
+    .option('--folder <folder>', 'Folder containing markdown and image files (auto-extracts gallery name from first heading in markdown)')
     .option('-f, --format <formats>', 'Comma-separated list of supported formats', SUPPORTED_EXTENSIONS.join(','))
     .option('-q, --quality <number>', 'JPEG quality (1-100)', '90')
     .option('-c, --compression <number>', 'PNG compression level (0-9)', '9')
@@ -406,6 +490,22 @@ function parseArguments() {
     .parse();
   
   const options = program.opts();
+  
+  // Check if we're in folder mode or manual mode
+  const isFolderMode = !!options.folder;
+  const isManualMode = !!(options.name && options.description && options.paths);
+  
+  if (!isFolderMode && !isManualMode) {
+    console.error('❌ You must either:');
+    console.error('   - Use --folder <folder> to process a folder containing markdown and image files');
+    console.error('   - Use --name, --description, and --paths for manual mode');
+    process.exit(1);
+  }
+  
+  if (isFolderMode && isManualMode) {
+    console.error('❌ Cannot use both folder mode and manual mode at the same time');
+    process.exit(1);
+  }
   
   // Validate quality
   const quality = parseInt(options.quality);
@@ -422,13 +522,15 @@ function parseArguments() {
   }
   
   return {
+    folder: options.folder,
     galleryName: options.name,
     galleryDescription: options.description,
     imagePaths: options.paths,
     quality,
     compression,
     optimize: options.optimize,
-    dryRun: options.dryRun
+    dryRun: options.dryRun,
+    isFolderMode
   };
 }
 
@@ -437,42 +539,60 @@ async function main() {
   try {
     const options = parseArguments();
     
-    // Resolve description if it's a markdown file
-    const resolvedDescription = await resolveDescription(options.galleryDescription);
-    
-    // Expand glob patterns
-    console.log('🔍 Expanding file patterns...');
-    const expandedPaths = await expandGlobPatterns(options.imagePaths);
-    
-    if (expandedPaths.length === 0) {
-      console.error('❌ No files found matching the provided patterns');
-      process.exit(1);
-    }
-    
-    console.log(`✅ Found ${expandedPaths.length} files to process\n`);
-    
-    if (options.dryRun) {
-      console.log('🔍 DRY RUN MODE - No files will be imported\n');
-      for (const path of expandedPaths) {
-        const { folderName, filename } = generateGalleryPath(options.galleryName, path);
-        console.log(`📸 Would import: ${path}`);
-        console.log(`   → Would save as: ${folderName}/${filename}`);
+    if (options.isFolderMode) {
+      // Folder mode - process folder containing markdown and image files
+      if (options.dryRun) {
+        console.log('🔍 DRY RUN MODE - No files will be imported\n');
+        console.log(`📁 Would process folder: ${options.folder}`);
+        console.log(`🎯 Quality: ${options.quality}, Compression: ${options.compression}`);
+        console.log(`⚙️  Optimization: ${options.optimize ? 'enabled' : 'disabled'}`);
+        return;
       }
-      console.log(`\n📊 Would create gallery: "${options.galleryName}"`);
-      console.log(`📝 Description: "${resolvedDescription}"`);
-      console.log(`🎯 Quality: ${options.quality}, Compression: ${options.compression}`);
-      console.log(`⚙️  Optimization: ${options.optimize ? 'enabled' : 'disabled'}`);
-      return;
+      
+      await processFolderForGallery(
+        options.folder,
+        options.quality,
+        options.compression,
+        options.optimize
+      );
+    } else {
+      // Manual mode - use provided name, description, and paths
+      const resolvedDescription = await resolveDescription(options.galleryDescription);
+      
+      // Expand glob patterns
+      console.log('🔍 Expanding file patterns...');
+      const expandedPaths = await expandGlobPatterns(options.imagePaths);
+      
+      if (expandedPaths.length === 0) {
+        console.error('❌ No files found matching the provided patterns');
+        process.exit(1);
+      }
+      
+      console.log(`✅ Found ${expandedPaths.length} files to process\n`);
+      
+      if (options.dryRun) {
+        console.log('🔍 DRY RUN MODE - No files will be imported\n');
+        for (const path of expandedPaths) {
+          const { folderName, filename } = generateGalleryPath(options.galleryName, path);
+          console.log(`📸 Would import: ${path}`);
+          console.log(`   → Would save as: ${folderName}/${filename}`);
+        }
+        console.log(`\n📊 Would create gallery: "${options.galleryName}"`);
+        console.log(`📝 Description: "${resolvedDescription}"`);
+        console.log(`🎯 Quality: ${options.quality}, Compression: ${options.compression}`);
+        console.log(`⚙️  Optimization: ${options.optimize ? 'enabled' : 'disabled'}`);
+        return;
+      }
+      
+      await importPhotos(
+        options.galleryName, 
+        resolvedDescription, 
+        expandedPaths,
+        options.quality,
+        options.compression,
+        options.optimize
+      );
     }
-    
-    await importPhotos(
-      options.galleryName, 
-      resolvedDescription, 
-      expandedPaths,
-      options.quality,
-      options.compression,
-      options.optimize
-    );
     
   } catch (error) {
     console.error('❌ Fatal error:', error);
