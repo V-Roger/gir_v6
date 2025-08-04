@@ -21,3 +21,11 @@
     color: currentColor;
   }
 }
+
+hr {
+  border-width: 1px;
+  border-color: currentColor;
+  border-radius: 2px;
+  margin-left: 20%;
+  margin-right: 20%;
+}

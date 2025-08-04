@@ -4,6 +4,7 @@
   import Loader from '$lib/components/filmLoader.svelte'
   import IntersectionObserver from '$lib/components/intersectionObserver.svelte'
   import { onMount } from 'svelte'
+  import { compile } from 'mdsvex'
 
   const { data }: PageProps = $props()
 
@@ -13,6 +14,8 @@
 
   let loadedImages = $state<string[]>([])
   let loadingImages = $state(new Set<string>())
+  let description = $state('')
+  let hasMarkdownDescription = $state(false)
 
   function handleImageLoad(photoPath: string) {
     loadedImages.push(photoPath)
@@ -37,17 +40,33 @@
     }
   }
 
-  onMount(() => {
+  onMount(async () => {
     data.photos.slice(0, 5).forEach((photo) => {
       if (photo.path) {
         startLoadingImage(photo.path)
       }
     })
+
+    if (data.gallery.description && data.gallery.description.startsWith('---')) {
+      hasMarkdownDescription = true
+      const result = await compile(data.gallery.description)
+      if (result) {
+        description = result.code
+      }
+    }
   })
 </script>
 
-<h1>{data.gallery.name}</h1>
-<p>{data.gallery.description}</p>
+<header class="max-h-[60vh] overflow-y-auto">
+  <div class="rounded-sm bg-black/4 p-6 dark:bg-white/5 dark:prose-invert">
+    {#if hasMarkdownDescription}
+      {@html description}
+    {:else}
+      <h1>{data.gallery.name}</h1>
+      <p>{data.gallery.description}</p>
+    {/if}
+  </div>
+</header>
 
 <div class="not-prose flex flex-col items-end gap-4">
   {#if data.photos}
