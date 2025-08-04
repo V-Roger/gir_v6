@@ -131,7 +131,7 @@
     </aside>
 
     <section
-      class="prose max-w-full space-y-4 overflow-hidden rounded-sm prose-neutral dark:prose-invert"
+      class="prose w-full max-w-full space-y-4 overflow-hidden rounded-sm prose-neutral dark:prose-invert"
       class:hidden={isTooSmall && isMenuActive}
     >
       {#if loading}

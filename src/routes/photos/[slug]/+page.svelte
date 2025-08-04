@@ -14,8 +14,10 @@
 
   let loadedImages = $state<string[]>([])
   let loadingImages = $state(new Set<string>())
-  let description = $state('')
+  let description = $state<string | undefined>(undefined)
   let hasMarkdownDescription = $state(false)
+  let title = $state<string | undefined>(undefined)
+  let exhibitions = $state<{ place: string; date: string; label: string }[]>([])
 
   function handleImageLoad(photoPath: string) {
     loadedImages.push(photoPath)
@@ -41,26 +43,43 @@
   }
 
   onMount(async () => {
+    hasMarkdownDescription = Boolean(data.gallery.description && data.gallery.description.startsWith('---'))
     data.photos.slice(0, 5).forEach((photo) => {
       if (photo.path) {
         startLoadingImage(photo.path)
       }
     })
 
-    if (data.gallery.description && data.gallery.description.startsWith('---')) {
-      hasMarkdownDescription = true
-      const result = await compile(data.gallery.description)
+    if (hasMarkdownDescription) {
+      const result = await compile(data.gallery.description!)
       if (result) {
         description = result.code
+        title = (result.data as { fm: { title: string } })?.fm?.title
+        exhibitions =
+          (result.data as { fm: { exhibitions: { place: string; date: string; label: string }[] } })?.fm?.exhibitions
+          ?? []
       }
     }
   })
 </script>
 
 <header class="max-h-[60vh] overflow-y-auto">
-  <div class="rounded-sm bg-black/4 p-6 dark:bg-white/5 dark:prose-invert">
+  <div class="content rounded-sm bg-black/4 p-6 dark:bg-white/5 dark:prose-invert">
     {#if hasMarkdownDescription}
-      {@html description}
+      {#if title}
+        <h1>{title}</h1>
+      {/if}
+      {#if description}
+        {@html description}
+      {/if}
+      {#if exhibitions.length > 0}
+        <h2>Expositions</h2>
+        <ul>
+          {#each exhibitions as exhibition}
+            <li>{exhibition.place} / <br /> <em>{exhibition.date}</em> <br /> <b>{exhibition.label}</b></li>
+          {/each}
+        </ul>
+      {/if}
     {:else}
       <h1>{data.gallery.name}</h1>
       <p>{data.gallery.description}</p>
@@ -68,7 +87,7 @@
   </div>
 </header>
 
-<div class="not-prose flex flex-col items-end gap-4">
+<div class="not-prose flex w-full flex-col items-center gap-4">
   {#if data.photos}
     {#each data.photos as photo}
       {#if photo.path}
@@ -85,7 +104,8 @@
             onload={() => photo.path && handleImageLoad(photo.path)}
             onerror={() => photo.path && handleImageError(photo.path)}
             class:opacity-0={!loadedImages.includes(photo.path)}
-            class="max-h-screen max-w-full object-contain"
+            class:max-h-screen={loadedImages.includes(photo.path)}
+            class="max-h-0 max-w-full object-contain"
             loading="lazy"
           />
         </IntersectionObserver>

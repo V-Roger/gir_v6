@@ -10,8 +10,8 @@
 <style>
   .filmstrip {
     position: fixed;
-    top: calc(50% - 50px);
-    left: calc(50% - 30px);
+    top: calc(50% - 30px);
+    left: calc(50% - 50px);
     z-index: 1000;
     width: 60px;
     height: 100px;
@@ -31,6 +31,8 @@
 
     &.relative {
       position: relative;
+      top: unset;
+      left: unset;
     }
 
     &:before,
