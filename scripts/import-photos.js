@@ -220,6 +220,60 @@ async function selectCoverPhoto(processedPhotos) {
   });
 }
 
+// Function to read markdown file content
+async function readMarkdownFile(filePath) {
+  try {
+    // Check if file exists
+    await fs.access(filePath);
+    
+    const content = await fs.readFile(filePath, 'utf-8');
+    const trimmedContent = content.trim();
+    
+    if (!trimmedContent) {
+      throw new Error('Markdown file is empty');
+    }
+    
+    return trimmedContent;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      throw new Error(`Markdown file not found: "${filePath}"`);
+    }
+    throw new Error(`Could not read markdown file "${filePath}": ${error.message}`);
+  }
+}
+
+// Function to check if a string is a file path
+function isFilePath(str) {
+  // Check for markdown file extensions
+  if (str.endsWith('.md') || str.endsWith('.markdown')) {
+    return true;
+  }
+  
+  // Check for path separators (Unix or Windows)
+  if (str.includes('/') || str.includes('\\')) {
+    return true;
+  }
+  
+  // Check if it looks like a relative path (starts with ./ or ../)
+  if (str.startsWith('./') || str.startsWith('../')) {
+    return true;
+  }
+  
+  return false;
+}
+
+// Function to resolve description (either direct text or from markdown file)
+async function resolveDescription(descriptionInput) {
+  if (isFilePath(descriptionInput)) {
+    console.log(`📖 Reading description from markdown file: ${descriptionInput}`);
+    const content = await readMarkdownFile(descriptionInput);
+    console.log(`✅ Successfully read ${content.length} characters from markdown file`);
+    return content;
+  }
+  console.log(`📝 Using description as text: "${descriptionInput}"`);
+  return descriptionInput;
+}
+
 // Main import function
 async function importPhotos(galleryName, galleryDescription, imagePaths, quality = 90, compression = 9, optimize = true) {
   try {
@@ -342,7 +396,7 @@ function parseArguments() {
     .description('Import photos into your Svelte app gallery system')
     .version('1.0.0')
     .requiredOption('-n, --name <name>', 'Gallery name')
-    .requiredOption('-d, --description <description>', 'Gallery description')
+    .requiredOption('-d, --description <description>', 'Gallery description (text or path to .md/.markdown file)')
     .requiredOption('-p, --paths <paths...>', 'Image file paths or glob patterns')
     .option('-f, --format <formats>', 'Comma-separated list of supported formats', SUPPORTED_EXTENSIONS.join(','))
     .option('-q, --quality <number>', 'JPEG quality (1-100)', '90')
@@ -383,6 +437,9 @@ async function main() {
   try {
     const options = parseArguments();
     
+    // Resolve description if it's a markdown file
+    const resolvedDescription = await resolveDescription(options.galleryDescription);
+    
     // Expand glob patterns
     console.log('🔍 Expanding file patterns...');
     const expandedPaths = await expandGlobPatterns(options.imagePaths);
@@ -402,7 +459,7 @@ async function main() {
         console.log(`   → Would save as: ${folderName}/${filename}`);
       }
       console.log(`\n📊 Would create gallery: "${options.galleryName}"`);
-      console.log(`📝 Description: "${options.galleryDescription}"`);
+      console.log(`📝 Description: "${resolvedDescription}"`);
       console.log(`🎯 Quality: ${options.quality}, Compression: ${options.compression}`);
       console.log(`⚙️  Optimization: ${options.optimize ? 'enabled' : 'disabled'}`);
       return;
@@ -410,7 +467,7 @@ async function main() {
     
     await importPhotos(
       options.galleryName, 
-      options.galleryDescription, 
+      resolvedDescription, 
       expandedPaths,
       options.quality,
       options.compression,
