@@ -1,6 +1,5 @@
 <script lang="ts">
   import '../app.css'
-  import svgLogo from '../assets/logo_vroger.svg?raw'
   import { createRoutesTree, flattenRoutesTree } from '$lib/routing'
   import { innerWidth } from 'svelte/reactivity/window'
   import { page } from '$app/state'
@@ -52,8 +51,27 @@
         href="/"
         title="Accueil"
         class="flex w-full overflow-hidden rounded-xs xl:rounded-sm"
+        aria-label="Accueil"
       >
-        {@html svgLogo}
+        <svg
+          x="0px"
+          y="0px"
+          width="2160px"
+          height="1440px"
+          viewBox="0 0 2160 1440"
+        >
+          <g>
+            <polygon points="1001.052,1439.997 258.925,0 0.919,0 0.919,1439.997     " />
+            <path
+              d="M1743.194,0l-1.773,3.44c75.568,80.704,121.88,189.11,121.88,308.39c0,249.338-202.13,451.485-451.481,451.485
+            c-20.329,0-40.3-1.48-59.917-4.083l-20.051,38.897l330.535,641.868h511.156V0H1743.194z"
+            />
+          </g>
+          <polygon
+            fill="#BCBEC0"
+            points="1001.052,1439.997 1351.892,759.231 1702.723,1439.997 "
+          />
+        </svg>
       </a>
       {#if isTooSmall}
         <button
